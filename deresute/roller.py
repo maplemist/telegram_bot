@@ -187,6 +187,18 @@ def _get_pool(id):
     return _create_pool(id)
 
 
+def _is_ssr2(card):
+    '''
+    Check if card is SSR2.
+    :type card: dict
+    :rtype: bool
+    '''
+    filepath = os.path.join(os.getcwd(), 'data', 'deresute', 'ssr2.json')
+    with open(filepath, 'r') as f:
+        d = json.load(f)
+        return card['name'] in d and card['tag'] == '[{0}]'.format(d[card['name']])
+
+
 def _roll(id, amount, rate='rate'):
     '''
     Do 'amount' of rolls on the gacha pool with id.
@@ -227,7 +239,8 @@ def _get_results(gacha, rolls):
     reg_ssr = sum(dic[('SSR', False)].values())
     if reg_ssr > 0:
         results += '\nSSR: {0}\n'.format(reg_ssr) + \
-                   ', '.join('{0[name]} {1}'.format(card, 'x{0}'.format(count) if count > 1 else '')
+                   ', '.join('{0[name]}{1}{2}'.format(card, '2' if _is_ssr2(card) else '',
+                   ' x{0}'.format(count) if count > 1 else '')
                    for card, count in dic[('SSR', False)].items())
 
     # Limited SR
