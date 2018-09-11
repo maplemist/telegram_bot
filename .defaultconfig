@@ -1,0 +1,9 @@
+[Token]
+Chihiro: YOUR_BOT_TOKEN_HERE
+
+[Channel]
+Chihiro: CHANNEL_ID
+Testing: CHANNEL_ID
+
+[Username]
+Owner: YOUR_USERNAME

@@ -1,0 +1,8 @@
+{
+  "top": "^/top(10{1,2}|1120|2130)",
+  "roll": "^/(\\d*)roll(?:#(\\d*))?",
+  "help": "^/(?:start|help)",
+  "calmdown": "^/(?:calmdown|ld|llc|gay|hentai)",
+  "ken": "^/(?:ken)",
+  "epluslomo": "^/(?:epluslomo)"
+}

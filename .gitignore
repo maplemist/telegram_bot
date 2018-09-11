@@ -1,0 +1,6 @@
+.config
+.DS_Store
+
+data/gacha
+ENV
+*__pycache__
