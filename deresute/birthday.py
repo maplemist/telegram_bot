@@ -21,7 +21,7 @@ Definitions
 '''
 
 DIR = os.path.join(os.getcwd(), 'data', 'deresute')
-FILENAME = 'birthday.json'
+FILENAME = {'CHAR': 'birthday.json', 'CV': 'birthday-cv.json'}
 URL = 'https://imascg-slstage.boom-app.wiki/entry/idol-birthday'
 JST = pytz.timezone('Asia/Tokyo')
 
@@ -72,18 +72,31 @@ def _get_from_db():
 
 def _get_all():
     '''
-    Get all birthday information.
+    Get all characters' birthday information.
     :rtype: dict
     '''
     # check file existence
-    filepath = os.path.join(DIR, FILENAME)
+    filepath = os.path.join(DIR, FILENAME['CHAR'])
     if os.path.isfile(filepath):
         with open(filepath, 'r') as f:
             return json.load(f)
 
     data = _get_from_db()
-    _write_file(data, DIR, FILENAME)
+    _write_file(data, DIR, FILENAME['CHAR'])
     return data
+
+
+def _get_all_cv():
+    '''
+    Get all CVs' birthday information.
+    :rtype: dict
+    '''
+    filepath = os.path.join(DIR, FILENAME['CV'])
+    if os.path.isfile(filepath):
+        with open(filepath, 'r') as f:
+            return json.load(f)
+    # TODO: read from https://imas-db.jp/calendar/birthdays
+    return {}
 
 
 '''
@@ -96,8 +109,10 @@ def get_date(datetime):
     :type datetime: datetime
     :rtype: list
     '''
-    data = _get_all()
-    return data[str(datetime.month)].get(str(datetime.day), [])
+    ch_data = _get_all()
+    cv_data = _get_all_cv()
+    return ch_data[str(datetime.month)].get(str(datetime.day), []) + \
+           cv_data[str(datetime.month)].get(str(datetime.day), [])
 
 
 def get_today():
