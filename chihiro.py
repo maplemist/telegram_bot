@@ -13,6 +13,7 @@ Telegram: @maplemist
 
 from datetime import datetime, time, timedelta
 
+import ast
 import configparser
 import json
 import logging
@@ -64,6 +65,20 @@ def _get_username(username='owner'):
     cfg = configparser.ConfigParser()
     cfg.readfp(open(CFG_FILE))
     return cfg.get('Username', username)
+
+
+def _has_tag(text):
+    '''
+    Check if the text has tag or not.
+    :rtype: bool
+    '''
+    cfg = configparser.ConfigParser()
+    cfg.readfp(open(CFG_FILE))
+    tags = ast.literal_eval(cfg.get('Tags', 'Chihiro'))
+    for tag in tags:
+        if tag in text:
+            return True
+    return False
 
 
 '''
@@ -280,9 +295,9 @@ Twitter Forwarding Functions
 def forward(bot, update):
     '''Forward message when target user sends a message in the specific channel.'''
     logger.info('{0} @ {1}: {2}'.format(update.message.from_user.username, update.message.chat.title, update.message.text))
-    if update.message.chat.id == _get_chat_id('Forward'):
+    if update.message.chat.id == _get_chat_id('Forward') and _has_tag(update.message.text):
         bot.send_message(chat_id=_get_chat_id(chat='Chihiro'), text=update.message.text)
-        # bot.send_message(chat_id=_get_chat_id(), text=update.message.text) # Debug
+        bot.send_message(chat_id=_get_chat_id(), text=update.message.text) # Debug
 
 
 '''
