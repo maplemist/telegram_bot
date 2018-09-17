@@ -280,8 +280,9 @@ Twitter Forwarding Functions
 def forward(bot, update):
     '''Forward message when target user sends a message in the specific channel.'''
     logger.info('{0} @ {1}: {2}'.format(update.message.from_user.username, update.message.chat.title, update.message.text))
-    bot.send_message(chat_id=_get_chat_id(chat='Chihiro'), text=update.message.text)
-    # bot.send_message(chat_id=_get_chat_id(), text=update.message.text) # Debug
+    if update.message.chat.id == _get_chat_id('Forward'):
+        bot.send_message(chat_id=_get_chat_id(chat='Chihiro'), text=update.message.text)
+        # bot.send_message(chat_id=_get_chat_id(), text=update.message.text) # Debug
 
 
 '''
@@ -342,8 +343,7 @@ def main():
     dp.add_handler(tg.RegexHandler(patterns['epluslomo'], epluslomo))
 
     # Twitter forwarding
-    dp.add_handler(tg.MessageHandler(tg.Filters.chat(chat_id=_get_chat_id('Forward'),
-                                                     username=_get_username(username='IFTTT')), foward))
+    dp.add_handler(tg.MessageHandler(tg.Filters.user(username=_get_username(username='IFTTT')), forward))
 
     # Debug
     dp.add_handler(tg.MessageHandler(tg.Filters.user(username=_get_username()), debug))
