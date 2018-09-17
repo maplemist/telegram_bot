@@ -77,7 +77,7 @@ def _get_from_db():
 
 def _get_all():
     '''
-    Get all characters' birthday information.
+    Get all CG related birthday information.
     :rtype: dict
     '''
     # Check file existence
