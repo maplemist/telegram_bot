@@ -57,7 +57,7 @@ def _get_banner(gacha):
         prev = prev['gachas'][0]
         while TYPE['select'] in prev['name']:
             offset -= 1
-            prev = happening.at(_prev_timestamp(gacha['start_date']))
+            prev = happening.at(_prev_timestamp(prev['start_date']))
             prev = prev['gachas'][0]
         gacha['name'] += ' (Cute)' if offset == 0 else ' (Cool)' if offset == -1 else ' (Passion)'
         return BANNER['gacha'].format(str(gacha['id'] + offset)[1:])
