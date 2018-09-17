@@ -26,6 +26,7 @@ def at(time):
     :type time: 'now' or timestamp
     :rtype: dict
     '''
+    logging.info('happening at: {0}'.format(time))
     status = None
     headers = {'content-type': 'application/json'}
     for url in URL:
