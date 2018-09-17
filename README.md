@@ -37,7 +37,7 @@ $ pip3 install -r requirements.txt
 ```
 </details>
 
-@map_chihiro_bot
+<br>[@map_chihiro_bot](https://t.me/map_chihiro_bot)
 
 ### Bot to publish information related to "The iDOLM@STER Cinderella Girls Starlight Stage"
 * Framework update and major overhaul to my [old bot](https://github.com/maplemist/cgss_telegram_bot)
@@ -56,4 +56,5 @@ $ python3 chihiro.py
 <summary><strong>TODO</strong></summary>
 
 * Refactoring
+* Forward messages from IFTTT to target channel for better UX
 </details>
