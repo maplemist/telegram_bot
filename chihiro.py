@@ -75,10 +75,7 @@ def _has_tag(text):
     cfg = configparser.ConfigParser()
     cfg.readfp(open(CFG_FILE))
     tags = ast.literal_eval(cfg.get('Tags', 'Chihiro'))
-    for tag in tags:
-        if tag in text:
-            return True
-    return False
+    return any(tag in text for tag in tags)
 
 
 '''
