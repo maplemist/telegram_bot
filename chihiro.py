@@ -116,7 +116,7 @@ def _event_helper(type, unit, rank=None):
     '''
     # Check what is happening
     resp = deresute.happening.now()
-    if not resp:
+    if not resp or not resp['events']:
         return canned['No_Event']
 
     # Parse event information into output
@@ -142,7 +142,7 @@ def _gacha_roll_helper(total, index):
     :rtype: dict
     '''
     resp = deresute.happening.now()
-    if not resp:
+    if not resp or not resp['gachas']:
         update.message.reply_text(canned['No_Data'])
 
     # Try to get the dict info for gacha
