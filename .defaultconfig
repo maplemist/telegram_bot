@@ -3,12 +3,13 @@ Chihiro: YOUR_BOT_TOKEN_HERE
 
 [Chat]
 Chihiro: CHAT_ID
-Forward: CHAT_ID
 Testing: CHAT_ID
 
 [Username]
 Owner: YOUR_USERNAME
-IFTTT: IFTTT
+
+[Forward]
+Chihiro: CHAT_ID
 
 [Tags]
 Chihiro: ["TAG_1", "TAG_2"]

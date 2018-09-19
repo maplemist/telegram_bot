@@ -37,14 +37,24 @@ JST = pytz.timezone('Asia/Tokyo')
 Config Related Private Helper Functions
 '''
 
+def _read_config(section, key):
+    '''
+    Get the val of key in section from config file.
+    :type section: str
+    :type key: str
+    :rtype: str
+    '''
+    cfg = configparser.ConfigParser()
+    cfg.readfp(open(CFG_FILE))
+    return cfg.get(section, key)
+
+
 def _get_token():
     '''
     Get token from config file.
     :rtype: str
     '''
-    cfg = configparser.ConfigParser()
-    cfg.readfp(open(CFG_FILE))
-    return cfg.get('Token', 'Chihiro')
+    return _read_config('Token', 'Chihiro')
 
 
 def _get_chat_id(chat='Testing'):
@@ -52,9 +62,15 @@ def _get_chat_id(chat='Testing'):
     Get chat_id from config file.
     :rtype: int
     '''
-    cfg = configparser.ConfigParser()
-    cfg.readfp(open(CFG_FILE))
-    return int(cfg.get('Chat', chat))
+    return int(_read_config('Chat', chat))
+
+
+def _get_forward(chat):
+    '''
+    Get forward chat_id from config file.
+    :rtype: int
+    '''
+    return int(_read_config('Forward', chat))
 
 
 def _get_username(username='owner'):
@@ -62,9 +78,7 @@ def _get_username(username='owner'):
     Get username from config file.
     :rtype: str
     '''
-    cfg = configparser.ConfigParser()
-    cfg.readfp(open(CFG_FILE))
-    return cfg.get('Username', username)
+    return _read_config('Username', username)
 
 
 def _has_tag(text):
@@ -72,9 +86,7 @@ def _has_tag(text):
     Check if the text has tag or not.
     :rtype: bool
     '''
-    cfg = configparser.ConfigParser()
-    cfg.readfp(open(CFG_FILE))
-    tags = ast.literal_eval(cfg.get('Tags', 'Chihiro'))
+    tags = ast.literal_eval(_read_config('Tags', 'Chihiro'))
     return any(tag in text for tag in tags)
 
 
@@ -291,10 +303,10 @@ Twitter Forwarding Functions
 
 def forward(bot, update):
     '''Forward message when target user sends a message in the specific channel.'''
-    logger.info('{0} @ {1}: {2}'.format(update.message.from_user.username, update.message.chat.title, update.message.text))
-    if update.message.chat.id == _get_chat_id('Forward') and _has_tag(update.message.text):
-        bot.send_message(chat_id=_get_chat_id(chat='Chihiro'), text=update.message.text)
-        bot.send_message(chat_id=_get_chat_id(), text=update.message.text) # Debug
+    logger.info('@ {0} : {1}'.format(update.channel_post.chat.title, update.channel_post.text))
+    if _has_tag(update.channel_post.text):
+        bot.send_message(chat_id=_get_chat_id(chat='Chihiro'), text=update.channel_post.text)
+        bot.send_message(chat_id=_get_chat_id(), text=update.channel_post.text) # Debug
 
 
 '''
@@ -355,7 +367,7 @@ def main():
     dp.add_handler(tg.RegexHandler(patterns['epluslomo'], epluslomo))
 
     # Twitter forwarding
-    dp.add_handler(tg.MessageHandler(tg.Filters.user(username=_get_username(username='IFTTT')), forward))
+    dp.add_handler(tg.MessageHandler(tg.Filters.chat(chat_id=_get_forward('Chihiro')), forward))
 
     # Debug
     dp.add_handler(tg.MessageHandler(tg.Filters.user(username=_get_username()), debug))
