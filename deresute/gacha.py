@@ -19,7 +19,7 @@ JST = pytz.timezone('Asia/Tokyo')
 BANNER = {
     # 'gacha': 'http://game.starlight-stage.jp/image/announce/header/header_gacha_{0}.png',
     'gacha': 'http://apis.game.starlight-stage.jp/image/announce/header/header_gacha_{0}.png',
-    'rerun': 'http://game.starlight-stage.jp/image/announce/image/header_gacha_{0}.png'
+    'rerun': 'http://apis.game.starlight-stage.jp/image/announce/image/header_gacha_{0}.png'
 }
 TYPE = {
     'rerun': '復刻',

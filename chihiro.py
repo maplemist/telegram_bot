@@ -303,10 +303,10 @@ Twitter Forwarding Functions
 
 def forward(bot, update):
     '''Forward message when target user sends a message in the specific channel.'''
-    logger.info('@ {0} : {1}'.format(update.channel_post.chat.title, update.channel_post.text))
+    logger.info('@ {0} : {1}'.format(update.channel_post.chat.title, update.channel_post.text.split('\n')[1]))
     if _has_tag(update.channel_post.text):
         bot.send_message(chat_id=_get_chat_id(chat='Chihiro'), text=update.channel_post.text)
-        bot.send_message(chat_id=_get_chat_id(), text=update.channel_post.text) # Debug
+        # bot.send_message(chat_id=_get_chat_id(), text=update.channel_post.text) # Debug
 
 
 '''
