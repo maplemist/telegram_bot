@@ -28,6 +28,7 @@ URL = {
     '1120': 'https://deresute.mon.moe/d?type=0&rank=11+12+13+14+15+16+17+18+19+20&event={0}',
     '2130': 'https://deresute.mon.moe/d?type=0&rank=21+22+23+24+25+26+27+28+29+30&event={0}',
     '100': 'https://deresute.mon.moe/d?type=0&rank=50+60+70+80+90+100+110&event={0}',
+    '500': 'https://deresute.mon.moe/d?type=0&rank=201+301+401+501+601+701+801&event={0}',
     'PARAM': 'https://deresute.mon.moe/d?type=0&rank={1}&event={0}',
     'TROPHY': 'https://deresute.mon.moe/d?type=1&rank=5001+10001+{0}&event={1}',
     'TEASER': 'https://games.starlight-stage.jp/image/event/teaser/event_teaser_{0}.png',
