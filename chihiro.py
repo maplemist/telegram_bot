@@ -13,6 +13,7 @@ Telegram: @maplemist
 
 from datetime import datetime, time, timedelta
 
+import ast
 import configparser
 import json
 import logging
@@ -36,24 +37,40 @@ JST = pytz.timezone('Asia/Tokyo')
 Config Related Private Helper Functions
 '''
 
+def _read_config(section, key):
+    '''
+    Get the val of key in section from config file.
+    :type section: str
+    :type key: str
+    :rtype: str
+    '''
+    cfg = configparser.ConfigParser()
+    cfg.readfp(open(CFG_FILE))
+    return cfg.get(section, key)
+
+
 def _get_token():
     '''
     Get token from config file.
     :rtype: str
     '''
-    cfg = configparser.ConfigParser()
-    cfg.readfp(open(CFG_FILE))
-    return cfg.get('Token', 'Chihiro')
+    return _read_config('Token', 'Chihiro')
 
 
-def _get_chat_id(channel='Testing'):
+def _get_chat_id(chat='Testing'):
     '''
     Get chat_id from config file.
     :rtype: int
     '''
-    cfg = configparser.ConfigParser()
-    cfg.readfp(open(CFG_FILE))
-    return int(cfg.get('Channel', channel))
+    return int(_read_config('Chat', chat))
+
+
+def _get_forward(chat):
+    '''
+    Get forward chat_id from config file.
+    :rtype: int
+    '''
+    return int(_read_config('Forward', chat))
 
 
 def _get_username(username='owner'):
@@ -61,9 +78,16 @@ def _get_username(username='owner'):
     Get username from config file.
     :rtype: str
     '''
-    cfg = configparser.ConfigParser()
-    cfg.readfp(open(CFG_FILE))
-    return cfg.get('Username', username)
+    return _read_config('Username', username)
+
+
+def _has_tag(text):
+    '''
+    Check if the text has tag or not.
+    :rtype: bool
+    '''
+    tags = ast.literal_eval(_read_config('Tags', 'Chihiro'))
+    return any(tag in text for tag in tags)
 
 
 '''
@@ -104,7 +128,7 @@ def _event_helper(type, unit, rank=None):
     '''
     # Check what is happening
     resp = deresute.happening.now()
-    if not resp:
+    if not resp or not resp['events']:
         return canned['No_Event']
 
     # Parse event information into output
@@ -130,7 +154,7 @@ def _gacha_roll_helper(total, index):
     :rtype: dict
     '''
     resp = deresute.happening.now()
-    if not resp:
+    if not resp or not resp['gachas']:
         update.message.reply_text(canned['No_Data'])
 
     # Try to get the dict info for gacha
@@ -274,6 +298,18 @@ def epluslomo(bot, update):
 
 
 '''
+Twitter Forwarding Functions
+'''
+
+def forward(bot, update):
+    '''Forward message when target user sends a message in the specific channel.'''
+    logger.info('@ {0} : {1}'.format(update.channel_post.chat.title, update.channel_post.text.split('\n')[1]))
+    if _has_tag(update.channel_post.text):
+        bot.send_message(chat_id=_get_chat_id(chat='Chihiro'), text=update.channel_post.text)
+        # bot.send_message(chat_id=_get_chat_id(), text=update.channel_post.text) # Debug
+
+
+'''
 JobQueue Functions
 '''
 
@@ -284,7 +320,7 @@ def callback_birthday(bot, job):
     for idol in idols:
         congrats = canned['HBD'].format(idol)
         bot.send_message(chat_id=_get_chat_id(), text=congrats) # Debug
-        bot.send_message(chat_id=_get_chat_id(channel='Chihiro'), text=congrats)
+        bot.send_message(chat_id=_get_chat_id(chat='Chihiro'), text=congrats)
 
 
 '''
@@ -329,6 +365,9 @@ def main():
     dp.add_handler(tg.RegexHandler(patterns['calmdown'], calmdown))
     dp.add_handler(tg.RegexHandler(patterns['ken'], ken))
     dp.add_handler(tg.RegexHandler(patterns['epluslomo'], epluslomo))
+
+    # Twitter forwarding
+    dp.add_handler(tg.MessageHandler(tg.Filters.chat(chat_id=_get_forward('Chihiro')), forward))
 
     # Debug
     dp.add_handler(tg.MessageHandler(tg.Filters.user(username=_get_username()), debug))
