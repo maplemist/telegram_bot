@@ -160,7 +160,7 @@ def _gacha_roll_helper(total, index):
     # Try to get the dict info for gacha
     resp = resp['gachas']
     try:
-        gacha = resp[index]
+        gacha = resp[index - 1]
     except IndexError:
         gacha = resp[0]
 
