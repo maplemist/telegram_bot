@@ -140,7 +140,7 @@ def _event_helper(type, unit, rank=None):
         cutoff = deresute.event.get_cutoffs(resp['id'], type, rank=rank)
         result += '\n' + deresute.event.cutoff_output(cutoff, unit, ended)
     except (deresute.event.CurrentEventNotValidError, deresute.event.CurrentEventNotRankingError) as e:
-        return result + canned['Not_ranking']
+        return result + canned['Not_Ranking']
     except (deresute.event.NoDataCurrentlyAvailableError, TypeError) as e:
         return result + canned['No_Data']
     return result
