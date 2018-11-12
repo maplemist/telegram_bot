@@ -112,8 +112,8 @@ def _get_tmr():
     :rtype: datetime object
     '''
     d = datetime.today()
-    offset = 1 if d.hour >= 8 else 0
-    d = d.replace(hour=8, minute=0, second=3, microsecond=0) + timedelta(days=offset)
+    offset = 1 if d.hour >= 7 else 0
+    d = d.replace(hour=7, minute=0, second=3, microsecond=0) + timedelta(days=offset)
     logger.info('JobQueue first running time: {0}'.format(d))
     return d
 
