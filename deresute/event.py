@@ -141,10 +141,12 @@ def _get_banner_url():
     resp = requests.get(URL['NEWS'])
     soup = BeautifulSoup(resp.text, 'html.parser')
     posts = soup.findAll('a', {'class': 'none'})
-    event = [post['href'] for post in posts if 'イベント' in post.text and '開催' in post.text][0]
+    events = [post['href'] for post in posts if 'イベント' in post.text and '開催' in post.text]
+    if not events:
+        return URL['BANNER'].format(_get_banner_id())
 
     # read event post
-    resp = requests.get(event)
+    resp = requests.get(events[0])
     soup = BeautifulSoup(resp.text, 'html.parser')
     imgs = [img['src'] for img in soup.findAll('img') if 'header_event' in img['src']]
     return imgs[0] if imgs else URL['BANNER'].format(_get_banner_id())
