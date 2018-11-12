@@ -56,5 +56,4 @@ $ python3 chihiro.py
 <summary><strong>TODO</strong></summary>
 
 * Refactoring
-* Forward messages from IFTTT to target channel for better UX
 </details>
