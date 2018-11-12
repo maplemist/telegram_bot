@@ -134,7 +134,7 @@ def get_next(gachas):
         return None
 
     minutes = (timeleft.seconds // 60) % 60
-    results = ["次のガチャまであと {0} 分\nプロデューサーさん、準備はいいですか？".format(minutes)]
+    results = ["次のガシャまであと {0} 分\nプロデューサーさん、準備はいいですか？".format(minutes)]
 
     # Try to get previous gacha
     gacha = gachas[0]
@@ -154,7 +154,7 @@ def get_next(gachas):
         if offset in [0, -1]:
             # Adding next type to gacha name
             next_type = ' (Cool)' if offset == 0 else ' (Passion)'
-            results[0] += '\n次の' + gacha['name'].split('ガチャ')[0] + next_type
+            results[0] += '\n次の' + gacha['name'].split('ガシャ')[0] + next_type
 
         # Current is Passion
         else:

@@ -33,7 +33,8 @@ URL = {
     'TROPHY': 'https://deresute.mon.moe/d?type=1&rank=5001+10001+{0}&event={1}',
     'TEASER': 'https://games.starlight-stage.jp/image/event/teaser/event_teaser_{0}.png',
     'BANNER': 'https://apis.game.starlight-stage.jp/image/announce/header/header_event_{0:04d}.png',
-    'BANNER_ID': 'https://deresute.mon.moe/event'
+    'BANNER_ID': 'https://deresute.mon.moe/event',
+    'NEWS': 'https://apis.game.starlight-stage.jp/information/index/0/1/10/1'
 }
 
 JST = pytz.timezone('Asia/Tokyo')
@@ -132,6 +133,25 @@ def _get_banner_id():
     return len(entries)
 
 
+def _get_banner_url():
+    '''
+    Get banner URL.
+    '''
+    # read posts
+    resp = requests.get(URL['NEWS'])
+    soup = BeautifulSoup(resp.text, 'html.parser')
+    posts = soup.findAll('a', {'class': 'none'})
+    events = [post['href'] for post in posts if 'イベント' in post.text and '開催' in post.text]
+    if not events:
+        return URL['BANNER'].format(_get_banner_id())
+
+    # read event post
+    resp = requests.get(events[0])
+    soup = BeautifulSoup(resp.text, 'html.parser')
+    imgs = [img['src'] for img in soup.findAll('img') if 'header_event' in img['src']]
+    return imgs[0] if imgs else URL['BANNER'].format(_get_banner_id())
+
+
 def _get_timeleft(timestamp):
     '''
     Get time remaining from timestamp.
@@ -221,7 +241,7 @@ def event_output(event):
     event_time = '\n{0} - {1}'.format(s_dt.strftime('%m/%d %H:%M'), e_dt.strftime('%m/%d %H:%M %Z'))
 
     # Get Banner URL
-    banner = '\n' + URL['BANNER'].format(_get_banner_id())
+    banner = '\n' + _get_banner_url()
 
     # Event status
     timeleft = _get_timeleft(event['end_date'])
