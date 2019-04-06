@@ -140,6 +140,8 @@ def get_next(gachas):
     gacha = gachas[0]
     prev = happening.at(_prev_timestamp(gacha['start_date']))
     prev = prev['gachas'][0]
+    pprev = happening.at(_prev_timestamp(prev['start_date']))
+    pprev = pprev['gachas'][0]
 
     # Current is Type Select
     if TYPE['select'] in gacha['name']:
@@ -165,18 +167,17 @@ def get_next(gachas):
 
     next_id = gacha['id'] + 1
     # 3rd general pool of the month (Current is general, and previous is type select)
-    if TYPE['select'] in prev['name']:
+    if TYPE['select'] in [prev['name'], pprev['name']]:
         results[0] += '\n' + BANNER['gacha'].format(str(next_id)[1:])
         return results
 
     # Rerun next (current is general, 2nd previous is type select)
-    prev = happening.at(_prev_timestamp(prev['start_date']))
-    prev = prev['gachas'][0]
-    if TYPE['select'] in prev['name']:
+    pprev = happening.at(_prev_timestamp(pprev['start_date']))
+    pprev = pprev['gachas'][0]
+    if TYPE['select'] in pprev['name']:
         results.append(BANNER['rerun'].format(str(next_id)[1:]))
         results.append(BANNER['rerun'].format(str(next_id + 1)[1:]))
-        if next_id != 296: # TODO: Hot Spring
-            results.append(BANNER['rerun'].format(str(next_id + 2)[1:]))
+        results.append(BANNER['rerun'].format(str(next_id + 2)[1:]))
 
     # General
     else:
