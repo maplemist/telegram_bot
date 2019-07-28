@@ -112,8 +112,8 @@ def _get_tmr():
     :rtype: datetime object
     '''
     d = datetime.today()
-    offset = 1 if d.hour >= 7 else 0
-    d = d.replace(hour=7, minute=0, second=3, microsecond=0) + timedelta(days=offset)
+    offset = 1 if d.hour >= 8 else 0
+    d = d.replace(hour=8, minute=0, second=3, microsecond=0) + timedelta(days=offset)
     logger.info('JobQueue first running time: {0}'.format(d))
     return d
 
@@ -155,7 +155,7 @@ def _gacha_roll_helper(total, index):
     '''
     resp = deresute.happening.now()
     if not resp or not resp['gachas']:
-        update.message.reply_text(canned['No_Data'])
+        return {}
 
     # Try to get the dict info for gacha
     resp = resp['gachas']
@@ -252,6 +252,10 @@ def roll(bot, update):
 
     # Gacha roll simulations
     output = _gacha_roll_helper(count, index)
+    if not output:
+        update.message.reply_text(canned['No_Data'])
+        return
+
     update.message.reply_text(output['results'])
 
     # Send stickers for single roll
@@ -352,13 +356,13 @@ def main():
 
     # Event related
     dp.add_handler(tg.CommandHandler('event', event))
-    dp.add_handler(tg.CommandHandler('trophy', trophy))
-    dp.add_handler(tg.RegexHandler(patterns['top'], top))
+    # dp.add_handler(tg.CommandHandler('trophy', trophy))
+    # dp.add_handler(tg.RegexHandler(patterns['top'], top))
 
     # Gacha related
     dp.add_handler(tg.CommandHandler('gacha', gacha))
-    dp.add_handler(tg.CommandHandler('nextgacha', next_gacha))
-    dp.add_handler(tg.RegexHandler(patterns['roll'], roll))
+    # dp.add_handler(tg.CommandHandler('nextgacha', next_gacha))
+    # dp.add_handler(tg.RegexHandler(patterns['roll'], roll))
 
     # Others
     dp.add_handler(tg.RegexHandler(patterns['help'], help))

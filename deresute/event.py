@@ -23,14 +23,15 @@ Definitions
 URL = {
     'KIRARA': 'https://starlight.kirara.ca/api/v1/happening/now?extended_time_period_for_events=yes',
     '346LAB': 'http://starlight.346lab.org/api/v1/happening/now?extended_time_period_for_events=yes',
-    'EVENT': 'https://deresute.mon.moe/d?type=0&rank=501+2001+10001+20001+60001+120001+200001&event={0}',
-    'TOP10': 'https://deresute.mon.moe/d?type=0&rank=1+2+3+4+5+6+7+8+9+10&event={0}',
-    '1120': 'https://deresute.mon.moe/d?type=0&rank=11+12+13+14+15+16+17+18+19+20&event={0}',
-    '2130': 'https://deresute.mon.moe/d?type=0&rank=21+22+23+24+25+26+27+28+29+30&event={0}',
-    '100': 'https://deresute.mon.moe/d?type=0&rank=50+60+70+80+90+100+110&event={0}',
-    '500': 'https://deresute.mon.moe/d?type=0&rank=201+301+401+501+601+701+801&event={0}',
-    'PARAM': 'https://deresute.mon.moe/d?type=0&rank={1}&event={0}',
-    'TROPHY': 'https://deresute.mon.moe/d?type=1&rank=5001+10001+{0}&event={1}',
+    'EVENT': 'https://aidoru.info/event/border/{0}/501/2001/10001/20001/60001/120001',
+    # 'EVENT': 'https://deresute.mon.moe/d?type=0&rank=501+2001+10001+20001+60001+120001+200001&event={0}',
+    # 'TOP10': 'https://deresute.mon.moe/d?type=0&rank=1+2+3+4+5+6+7+8+9+10&event={0}',
+    # '1120': 'https://deresute.mon.moe/d?type=0&rank=11+12+13+14+15+16+17+18+19+20&event={0}',
+    # '2130': 'https://deresute.mon.moe/d?type=0&rank=21+22+23+24+25+26+27+28+29+30&event={0}',
+    # '100': 'https://deresute.mon.moe/d?type=0&rank=50+60+70+80+90+100+110&event={0}',
+    # '500': 'https://deresute.mon.moe/d?type=0&rank=201+301+401+501+601+701+801&event={0}',
+    # 'PARAM': 'https://deresute.mon.moe/d?type=0&rank={1}&event={0}',
+    # 'TROPHY': 'https://deresute.mon.moe/d?type=1&rank=5001+10001+{0}&event={1}',
     'TEASER': 'https://games.starlight-stage.jp/image/event/teaser/event_teaser_{0}.png',
     'BANNER': 'https://apis.game.starlight-stage.jp/image/announce/header/header_event_{0:04d}.png',
     'BANNER_ID': 'https://deresute.mon.moe/event',
@@ -205,8 +206,8 @@ def get_cutoffs(event_id, url_type, rank=None):
     headers = {'content-type': 'text/plain; charset=utf-8'}
     if url_type == 'TROPHY':
         url = URL[url_type].format(BRONZE[str(event_id)[:1]], str(event_id))
-    elif url_type == 'PARAM' and rank != None:
-        url = URL[url_type].format(str(event_id), rank)
+    # elif url_type == 'PARAM' and rank != None:
+    #     url = URL[url_type].format(str(event_id), rank)
     else:
         url = URL[url_type].format(str(event_id))
 
@@ -214,18 +215,32 @@ def get_cutoffs(event_id, url_type, rank=None):
         if resp.status_code != 200:
             return result
 
-        border_data = json.loads(resp.text)
+        # Read the data from script in the html
+        soup = BeautifulSoup(resp.text, 'html.parser')
+        text = soup.findAll('script', {"type": "text/javascript"})[3].text
+        text = text.split('d3.select(\'#chart_div\').append(\'svg\')\n\t\t\t\t.datum(function() {\n\t\t\t\t\treturn ')[1]
+        text = text.split('\n\t\t\t\t})\n\t\t\t\t.call(chart);')[0]
+        text = text.replace('area:', '"area":')
+        text = text.replace('key:', '"key":')
+        text = text.replace('values:', '"values":')
+        border_data = json.loads(text)
 
-        headers = border_data[0][0]
-        cutoff = border_data[0][-1]
+        # Obtain the latest information
+        headers, cutoffs, deltas = [], [], []
+        for data in border_data:
+            headers.append(data['key'].split(' ')[0])
+            cutoffs.append(data['values'][-1][1])
 
-        # Find data with 1 timedelta from latest data
-        deltas = border_data[0][-2] if len(border_data[0]) > 2 else [0] * len(cutoff)
+            # Find data with 1 timedelta from latest data
+            deltas.append(data['values'][-2][1] if len(data['values']) > 2 else 0)
+
+        # For some reason the timestamp is not unix epoch time and it is 9 hours ahead of it
+        lastUpdate = int(data['values'][-1][0]) / 1000
+        lastUpdate = lastUpdate - 60 * 60 * 9
 
         # Generate data
-        lastUpdate = int(cutoff[0])
-        tiers = tuple(tier_t(x, y, y - z) for x, y, z in zip(headers, cutoff[1:], deltas[1:]))
-        result = cutoff_t('Event Name', pytz.utc.localize(datetime.utcfromtimestamp(lastUpdate)), tiers)
+        tiers = tuple(tier_t(x, y, y - z) for x, y, z in zip(headers, cutoffs, deltas))
+        result = cutoff_t('Event Name', pytz.utc.localize(datetime.utcfromtimestamp(lastUpdate)).astimezone(JST), tiers)
         return result
 
 
@@ -241,7 +256,9 @@ def event_output(event):
     event_time = '\n{0} - {1}'.format(s_dt.strftime('%m/%d %H:%M'), e_dt.strftime('%m/%d %H:%M %Z'))
 
     # Get Banner URL
-    banner = '\n' + _get_banner_url()
+    # TODO: Need to fix
+    # banner = '\n' + _get_banner_url()
+    banner = ''
 
     # Event status
     timeleft = _get_timeleft(event['end_date'])
