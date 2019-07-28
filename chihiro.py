@@ -356,13 +356,13 @@ def main():
 
     # Event related
     dp.add_handler(tg.CommandHandler('event', event))
-    dp.add_handler(tg.CommandHandler('trophy', trophy))
-    dp.add_handler(tg.RegexHandler(patterns['top'], top))
+    # dp.add_handler(tg.CommandHandler('trophy', trophy))
+    # dp.add_handler(tg.RegexHandler(patterns['top'], top))
 
     # Gacha related
     dp.add_handler(tg.CommandHandler('gacha', gacha))
-    dp.add_handler(tg.CommandHandler('nextgacha', next_gacha))
-    dp.add_handler(tg.RegexHandler(patterns['roll'], roll))
+    # dp.add_handler(tg.CommandHandler('nextgacha', next_gacha))
+    # dp.add_handler(tg.RegexHandler(patterns['roll'], roll))
 
     # Others
     dp.add_handler(tg.RegexHandler(patterns['help'], help))
